@@ -28,6 +28,34 @@ Never rewrite these files. Always append. Never skip this step.
 
 ---
 
+
+## README Maintenance
+
+The README.md must always reflect the current state of the project.
+
+After any of the following, update README.md immediately:
+- A new setup step is completed (installs, scaffolding, config)
+- A new service is created or wired up
+- A new tool, plugin, or sub-agent is added
+- docker-compose.yml or any k8s manifest is changed
+- A new npm dependency is added to any service or the frontend
+
+### README sections to keep in sync
+
+| Section | What triggers an update |
+|---|---|
+| Initial Setup | Any new shell command run during project setup |
+| Repo Structure | Any new file or directory added |
+| Sub-Agents | Any new .claude/agents/ file |
+| Service Map | Any new service or port change |
+| Dependencies | Any npm install across any package.json |
+| How to Run | Any change to docker-compose or k8s manifests |
+
+### Rule
+When Copilot generates or edits any file in this repo, check whether that change 
+affects the README. If it does, append or update the relevant section in the same 
+response. Never leave README.md stale.
+
 ## Monorepo Structure
 
 ```

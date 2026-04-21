@@ -19,6 +19,18 @@ services:
     depends_on:
       - rabbitmq
 
+  cart:
+    build:
+      context: ./services/cart
+    image: cart-service:dev
+    ports:
+      - '3001:3001'
+    environment:
+      - PORT=3001
+      - VISUALISER_URL=http://visualiser:3006
+    depends_on:
+      - visualiser
+
 networks:
   default:
     name: event-demo-net

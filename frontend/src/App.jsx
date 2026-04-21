@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { io } from 'socket.io-client'
 
+const CART_URL = import.meta.env.VITE_CART_URL || 'http://localhost:3001'
+
 const EVENT_COLOURS = {
   CART_ITEM_ADDED:    '#60a5fa',
   PAYMENT_INITIATED:  '#f59e0b',
@@ -22,6 +24,90 @@ const MOCK_EVENTS = [
   { type:'STOCK_UPDATED',     service:'inventory',    payload:{ item:'Laptop', stock:9 } },
   { type:'NOTIFICATION_SENT', service:'notification', payload:{ msg:'Order confirmed' } },
 ]
+
+function CartPanel() {
+  const [products, setProducts] = useState([])
+  const [cartItems, setCartItems] = useState([])
+  const [unavailable, setUnavailable] = useState(false)
+
+  useEffect(() => {
+    fetch(`${CART_URL}/products`)
+      .then(r => r.json())
+      .then(d => setProducts(d.products))
+      .catch(() => setUnavailable(true))
+  }, [])
+
+  async function handleAdd(productId) {
+    try {
+      const res = await fetch(`${CART_URL}/cart/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId }),
+      })
+      if (!res.ok) return
+      const data = await res.json()
+      setCartItems(data.cart.items)
+    } catch {
+      // silent — event simply didn't happen
+    }
+  }
+
+  const total = cartItems.reduce((sum, item) => sum + item.price, 0)
+
+  if (unavailable) return (
+    <div style={{ background:'#141824', borderRadius:12, padding:20 }}>
+      <h2 style={{ fontSize:11, fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:1, marginBottom:16 }}>🛒 Cart</h2>
+      <p style={{ color:'#475569', fontSize:13, marginTop:20 }}>Service unavailable</p>
+    </div>
+  )
+
+  return (
+    <div style={{ background:'#141824', borderRadius:12, padding:20 }}>
+      <h2 style={{ fontSize:11, fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:1, marginBottom:16 }}>🛒 Cart</h2>
+
+      <div style={{ fontSize:10, color:'#475569', marginBottom:8, textTransform:'uppercase', letterSpacing:0.5 }}>Products</div>
+      <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:20 }}>
+        {products.map(p => (
+          <div key={p.id} style={{ background:'#1e2533', borderRadius:8, padding:'12px 14px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <div>
+              <div style={{ fontSize:13, fontWeight:600, color:'#e2e8f0' }}>{p.name}</div>
+              <div style={{ fontSize:11, color:'#475569', marginTop:2 }}>${p.price}</div>
+            </div>
+            <button onClick={() => handleAdd(p.id)} style={{ padding:'5px 14px', borderRadius:6, border:'none', background:'#3b82f6', color:'#fff', fontSize:12, fontWeight:600, cursor:'pointer' }}>
+              + Add
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ borderTop:'1px solid #1e2533', paddingTop:16, marginBottom:12 }}>
+        <div style={{ fontSize:10, color:'#475569', marginBottom:8, textTransform:'uppercase', letterSpacing:0.5 }}>
+          Cart ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})
+        </div>
+        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+          {cartItems.length === 0
+            ? <p style={{ color:'#334155', fontSize:12, textAlign:'center', paddingTop:4 }}>Empty</p>
+            : cartItems.map((item, i) => (
+              <div key={i} style={{ display:'flex', justifyContent:'space-between', fontSize:12, color:'#94a3b8', background:'#0f1117', padding:'8px 10px', borderRadius:6 }}>
+                <span>{item.name}</span><span>${item.price}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      {cartItems.length > 0 && (
+        <div style={{ display:'flex', justifyContent:'space-between', fontSize:13, color:'#e2e8f0', fontWeight:700, marginBottom:14, padding:'0 2px' }}>
+          <span>Total</span><span>${total}</span>
+        </div>
+      )}
+
+      <button disabled style={{ width:'100%', padding:10, borderRadius:8, border:'1px solid #2d3748', background:'#1e2533', color:'#475569', fontSize:13, fontWeight:600, cursor:'not-allowed' }}>
+        Checkout → (payment not wired)
+      </button>
+    </div>
+  )
+}
 
 function EventPill({ event }) {
   const colour = EVENT_COLOURS[event.type] || '#94a3b8'
@@ -125,7 +211,9 @@ export default function App() {
         </div>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:16, flex:1 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'280px 180px 1fr', gap:16, flex:1 }}>
+
+        <CartPanel />
 
         <div style={{ background:'#141824', borderRadius:12, padding:16 }}>
           <h2 style={{ fontSize:13, fontWeight:700, color:'#64748b', marginBottom:14, textTransform:'uppercase', letterSpacing:1 }}>Services</h2>
@@ -146,16 +234,17 @@ export default function App() {
               </p>
             )}
           </div>
-        </div>
-
-        <div style={{ background:'#141824', borderRadius:12, padding:16 }}>
-          <h2 style={{ fontSize:13, fontWeight:700, color:'#64748b', marginBottom:14, textTransform:'uppercase', letterSpacing:1 }}>Event Legend</h2>
-          {Object.entries(EVENT_COLOURS).map(([type, colour]) => (
-            <div key={type} style={{ display:'flex', alignItems:'center', gap:10, marginBottom:10 }}>
-              <div style={{ width:10, height:10, borderRadius:'50%', background:colour, flexShrink:0 }} />
-              <span style={{ fontSize:12, color:'#94a3b8' }}>{type}</span>
+          <div style={{ borderTop:'1px solid #1e2533', paddingTop:12, marginTop:8 }}>
+            <div style={{ fontSize:10, fontWeight:700, color:'#334155', textTransform:'uppercase', letterSpacing:1, marginBottom:8 }}>▾ Legend</div>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:10 }}>
+              {Object.entries(EVENT_COLOURS).map(([type, colour]) => (
+                <div key={type} style={{ display:'flex', alignItems:'center', gap:5 }}>
+                  <div style={{ width:8, height:8, borderRadius:'50%', background:colour, flexShrink:0 }} />
+                  <span style={{ fontSize:10, color:'#64748b' }}>{type}</span>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
 
       </div>

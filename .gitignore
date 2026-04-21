@@ -4,8 +4,11 @@ services/cart/node_modules/
 
 # Common ignores
 node_modules/
-/.env
+services/*/node_modules/
+frontend/node_modules/
+.env
 /.env.local
+.env.*
 dist/
 build/
 .vscode/

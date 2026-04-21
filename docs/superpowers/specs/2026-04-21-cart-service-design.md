@@ -162,7 +162,7 @@ Frontend environment variable: `VITE_CART_URL=http://localhost:3001` (`.env.deve
 | File | Change |
 |------|--------|
 | `services/cart/index.js` | Implement full service (replaces scaffold) |
-| `services/cart/package.json` | Add `express`, `cors`, `node-fetch` (Node 16 has no built-in fetch) |
+| `services/cart/package.json` | Add `express`, `cors` (native fetch used — Node 20+) |
 | `services/cart/Dockerfile` | Update for production-ready image |
 | `services/cart/__tests__/cart.test.js` | New test file |
 | `frontend/src/App.jsx` | Add `CartPanel`, update layout, move legend to footer |

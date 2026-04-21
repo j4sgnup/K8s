@@ -7,7 +7,7 @@ This repository is an event-driven microservices visualiser demo: a browser-base
 ## Prerequisites
 
 - Git (latest stable)
-- Node.js (16+)
+- Node.js (20+)
 - Docker Desktop (with Kubernetes enabled for optional k8s workflows)
 - kubectl (configured to your cluster)
 - Claude Code CLI (for installing the `superpowers` plugin)
@@ -131,6 +131,11 @@ git push
 - The above `curl` lines for the VoltAgent sub-agent files require the raw file URLs; update them to the correct source location before running.
 - If the `claude` or `copilot` CLIs require SSH to fetch private repos, prefer HTTPS URLs or configure SSH keys as needed.
 - This README documents the exact setup actions performed; it does not modify runtime behavior of services.
+
+## Dependencies
+
+- Frontend: added `framer-motion` and `socket.io-client` (used for animations and Socket.IO client integration).
+
 
 ## How to Run (development)
 

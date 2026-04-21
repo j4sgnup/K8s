@@ -28,6 +28,21 @@ Never rewrite these files. Always append. Never skip this step.
 
 ---
 
+## Status Sync Rules (MANDATORY)
+
+After every meaningful progress update (task completed, milestone reached, blocker found/cleared), update the **Current Status** section in both instruction files:
+- `.github/copilot-instructions.md`
+- `CLAUDE.md`
+
+Keep these three lines in sync across both files:
+- **Last completed**
+- **Currently working on**
+- **Known issues / blockers**
+
+Do not wait for the user to ask. If progress changed, update both files in the same response.
+
+---
+
 
 ## README Maintenance
 
@@ -160,8 +175,8 @@ Every service has a `__tests__/` folder. Do not skip tests.
 
 > **Update this section as you build.**
 
-**Last completed:** _nothing yet — starting now_
-**Currently working on:** _scaffolding_
+**Last completed:** _frontend visualiser, visualiser service, and cart service with tests wired in docker-compose_
+**Currently working on:** _payment service implementation and RabbitMQ publish flow_
 **Known issues / blockers:** _none_
 
 ---

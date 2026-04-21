@@ -1,0 +1,15 @@
+# Ignore Superpowers plugin working dir and service node_modules
+.superpowers/
+services/cart/node_modules/
+
+# Common ignores
+node_modules/
+/.env
+/.env.local
+dist/
+build/
+.vscode/
+.idea/
+npm-debug.log*
+yarn-error.log*
+.DS_Store
